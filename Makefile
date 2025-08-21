@@ -5,7 +5,7 @@
 
 # Default target
 help:
-	@echo "🛫 Airline Data Analyzer with Redis Caching"
+	@echo "Airline Data Analyzer with Redis Caching"
 	@echo ""
 	@echo "Available commands:"
 	@echo "  make setup        - Setup the complete environment"
@@ -22,56 +22,56 @@ help:
 
 # Setup complete environment
 setup:
-	@echo "🔧 Setting up environment..."
+	@echo "Setting up environment..."
 	@bash setup-env.sh
 
 # Activate virtual environment
 activate:
-	@echo "🔋 Activating environment..."
+	@echo "Activating environment..."
 	@bash activate-env.sh
 
 # Install dependencies only
 install:
-	@echo "📦 Installing dependencies..."
+	@echo "Installing dependencies..."
 	@pip install -r requirements.txt
 
 # Docker commands
 docker-up:
-	@echo "🐳 Starting Redis..."
+	@echo "Starting Redis..."
 	@docker-compose up -d redis
-	@echo "✅ Redis started on localhost:6379"
+	@echo "Redis started on localhost:6379"
 
 docker-down:
-	@echo "🛑 Stopping Redis..."
+	@echo "Stopping Redis..."
 	@docker-compose down
 
 docker-logs:
-	@echo "📄 Redis logs:"
+	@echo "Redis logs:"
 	@docker-compose logs redis
 
 # Application commands
 test:
-	@echo "🧪 Testing Redis connection..."
+	@echo "Testing Redis connection..."
 	@cd app && python main.py test
 
 demo:
-	@echo "🚀 Running demo..."
+	@echo "Running demo..."
 	@cd app && python main.py demo
 
 analyze:
-	@echo "📊 Starting interactive analysis..."
+	@echo "Starting interactive analysis..."
 	@cd app && python main.py analyze
 
 # Cleanup
 clean:
-	@echo "🧹 Cleaning up..."
+	@echo "Cleaning up..."
 	@bash cleanup.sh
 
 # Development commands
 dev-setup: setup docker-up
-	@echo "🛠️ Development environment ready!"
+	@echo "Development environment ready!"
 	@echo "Run 'make demo' to test everything"
 
 # Quick test after setup
 verify: docker-up test demo
-	@echo "✅ Everything is working!"
+	@echo "Everything is working!"

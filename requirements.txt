@@ -1,7 +1,8 @@
 redis==5.0.1
 pandas==2.1.4
 python-dotenv==1.0.0
-numpy==1.24.3
+numpy>=1.26.0
 click==8.1.7
 rich==13.7.0
 requests==2.31.0
+ipykernel
