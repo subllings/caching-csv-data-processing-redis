@@ -121,6 +121,28 @@ python app/main.py demo
 python app/main.py analyze
 ```
 
+## Commands
+
+```bash
+# Application
+python app/main.py test      # Test Redis connection
+python app/main.py demo      # Performance demo
+python app/main.py analyze   # Interactive analysis
+
+# Automated Demo
+./test-demo.sh               # Complete test & demo suite
+
+# Docker & Redis
+./start-redis.sh             # Start Redis (with checks)
+docker-compose up -d redis   # Start Redis (manual)
+docker-compose down          # Stop Redis
+docker-compose logs redis    # View logs
+
+# Environment
+./setup-env.sh              # Setup (includes activation)
+./cleanup.sh                # Complete cleanup (see below)
+```
+
 ## Test & Demo Script
 
 The `test-demo.sh` script is a comprehensive automation tool that handles the complete setup, testing, and demonstration of the Redis caching system.est
@@ -190,7 +212,7 @@ Enter your choice (1-4): 1
 ```
 ![picture 0](images/789e9ac18286f88de7702f53e2b8a16c31197e82c6174b62061a8800d6e9e8da.png)  
 
-![picture 1](images/1086ebb290aaa91771f69c95779639dcab19d8ce90d4139b7827836fd003976e.png)  
+
 
 
 ### Error Handling
@@ -278,27 +300,9 @@ Average Departure Delay per Airline (minutes)
 - **Memory Usage**: Results cached in Redis for 60 seconds
 - **Cache Keys**: Unique per analysis type and parameters
 
-## Commands
+![picture 4](images/577fa29072957275ff2b817d1f4c0fa98281b495e71ab6044b28c7359fd7013f.png)  
 
-```bash
-# Application
-python app/main.py test      # Test Redis connection
-python app/main.py demo      # Performance demo
-python app/main.py analyze   # Interactive analysis
 
-# Automated Demo
-./test-demo.sh               # Complete test & demo suite
-
-# Docker & Redis
-./start-redis.sh             # Start Redis (with checks)
-docker-compose up -d redis   # Start Redis (manual)
-docker-compose down          # Stop Redis
-docker-compose logs redis    # View logs
-
-# Environment
-./setup-env.sh              # Setup (includes activation)
-./cleanup.sh                # Complete cleanup (see below)
-```
 
 ## Cleanup Script
 
