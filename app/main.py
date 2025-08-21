@@ -86,7 +86,7 @@ class AirlineDataAnalyzer:
         
         # Sample data generation
         np.random.seed(42)
-        n_flights = 100000  # 100k sample flights
+        n_flights = 10000  # 10k sample flights (smaller for demo purposes)
         
         airlines = ['AA', 'DL', 'UA', 'WN', 'AS', 'B6', 'NK', 'F9', 'G4', 'HA']
         airports = ['ATL', 'LAX', 'ORD', 'DFW', 'DEN', 'JFK', 'SFO', 'SEA', 'LAS', 'MCO', 
