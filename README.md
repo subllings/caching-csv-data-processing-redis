@@ -1,225 +1,338 @@
-# 🛫 Airline Data Analyzer with Redis Caching
+# Airline Data Analyzer with Redis Caching
 
 A Python application that demonstrates **Redis caching** for optimizing expensive data transformations on airline delay datasets.
 
-![Python](https://img.shields.io/badge/python-v3.8+-blue.svg)
+![Python](https://img.shields.io/badge/python-v3.12+-blue.svg)
 ![Redis](https://img.shields.io/badge/redis-v7.0+-red.svg)
 ![Pandas](https://img.shields.io/badge/pandas-v2.1+-green.svg)
 
-## 🎯 Overview
+## What Are We Actually Doing? (Project Purpose)
 
-This project processes airline delay data and demonstrates how **Redis caching** can dramatically improve performance for repeated queries. It includes:
+### The Simple Explanation
 
-- **CSV data processing** with pandas
-- **Redis caching** with configurable TTL
-- **Performance benchmarking** (cache vs CSV)
-- **Beautiful CLI interface** with Rich
-- **Comprehensive airline analytics**
+**Imagine you're a data analyst at an airport company.** Your boss asks you questions like:
+- "Which airline has the worst delays?"
+- "Which airports are busiest?"
+- "What are the monthly delay trends?"
 
-## 🚀 Quick Start
+**The Problem:** Every time your boss asks a question, you have to:
+1. Open a huge Excel/CSV file with millions of flight records
+2. Wait 5-10 seconds while your computer calculates the answer
+3. Show the results
 
-### Option 1: Automated Setup (Recommended)
+**The Solution:** This project teaches you to use **Redis cache** to remember answers:
+1. First time: Calculate from CSV (slow - 5 seconds)
+2. Second time: Get answer from Redis memory (super fast - 0.002 seconds)
+3. Result: **250x faster!**
+
+### Real-World Applications
+
+This caching technique is used everywhere:
+- **Facebook/Instagram**: Cache your feed so it loads instantly
+- **Netflix**: Cache movie recommendations
+- **Google**: Cache search results
+- **Banking apps**: Cache account balances
+- **E-commerce**: Cache product prices
+
+### What You Learn
+
+1. **Data Processing**: How to analyze large CSV files with Python
+2. **Caching Strategy**: When and how to cache expensive calculations
+3. **Performance Optimization**: Measure and improve application speed
+4. **Redis Database**: Industry-standard in-memory database
+5. **Docker**: Containerization for easy deployment
+6. **Python Libraries**: pandas (data), Redis (cache), Rich (CLI)
+
+## Overview
+
+This project processes airline delay data and demonstrates how **Redis caching** can dramatically improve performance for repeated queries.
+
+**Features:**
+- CSV data processing with pandas
+- Redis caching with configurable TTL  
+- Performance benchmarking (cache vs CSV)
+- Beautiful CLI interface with Rich
+- Comprehensive airline analytics
+
+## Quick Start
+
+### Prerequisites
+- Python 3.12+
+- Docker Desktop (for Redis)
+
+### Setup & Run
+
+**Recommended: Complete Automated Setup**
 ```bash
-# Setup everything automatically
-bash setup-env.sh
+# 1. Setup environment
+./setup-env.sh
 
-# Activate environment
-source activate-env.sh
-
-# Run demo
-cd app && python main.py demo
+# 2. Run complete test & demo suite (recommended)
+./test-demo.sh
 ```
 
-### Option 2: Using Make
+### What Happens When You Run ./test-demo.sh
+
+**Step-by-Step Walkthrough:**
+
+1. **Environment Check** ✅
+   - Activates Python virtual environment
+   - Shows your Python version
+
+2. **Redis Startup** ✅
+   - Starts Redis database in Docker
+   - Tests connection to make sure it works
+
+3. **Menu Choice** 🎯
+   - Option 1: Quick automated demo
+   - Option 2: Interactive menu (that's what you used!)
+
+4. **When You Pick Option 2 (Interactive Analysis):**
+   - Shows 9 different questions you can ask about airline data
+   - You pick one (like "Average Departure Delay per Airline")
+
+5. **First Time You Ask a Question:**
+   - Computer says "Computing from CSV data..." (slow - 3 seconds)
+   - Calculates answer by reading the big CSV file
+   - Saves answer in Redis cache
+   - Shows you a nice table with results
+
+6. **Second Time You Ask the SAME Question:**
+   - Computer gets answer from Redis cache (super fast - 0.002 seconds)
+   - Shows same table but 250x faster!
+
+**That's it!** You just learned how caching works by seeing it in action.
+
+**Manual Step-by-Step:**
 ```bash
-# Setup and start everything
-make setup
-make docker-up
+# 1. Setup environment (includes activation)
+./setup-env.sh
 
-# Run demo
-make demo
+# 2. Start Redis (automated with checks)
+./start-redis.sh
 
-# Interactive analysis
-make analyze
+# 3. Test connection
+python app/main.py test
+
+# 4. Run demo
+python app/main.py demo
+
+# 5. Interactive analysis
+python app/main.py analyze
 ```
 
-### Option 3: Manual Setup
+## Test & Demo Script
+
+The `test-demo.sh` script is a comprehensive automation tool that handles the complete setup, testing, and demonstration of the Redis caching system.est
+
+### Features
+
+**Environment Validation:**
+- Checks if you're in the correct project directory
+- Validates virtual environment existence
+- Activates Python environment automatically
+- Displays Python version and environment details
+
+**Redis Management:**
+- Automatically detects if Redis is running
+- Starts Redis Docker container if needed
+- Waits for Redis to be fully ready (up to 15 seconds)
+- Tests Redis connection from Python application
+
+**Interactive Demo Options:**
+1. **Quick Demo** - Automated cache performance demonstration
+2. **Interactive Analysis** - Manual menu-driven exploration
+3. **Both** - Combined demo and interactive session
+4. **Exit** - Clean script termination
+
+### Usage
+
 ```bash
-# 1. Start Redis
-docker-compose up -d redis
+# Make script executable (first time only)
+chmod +x test-demo.sh
 
-# 2. Install Dependencies
-pip install -r requirements.txt
-
-# 3. Run the Application
-cd app
-python main.py analyze
-
-# 4. Quick Demo
-python main.py demo
+# Run the complete test and demo suite
+./test-demo.sh
 ```
 
-## �️ Available Scripts
+### What It Does
 
-### Setup & Management
+1. **Environment Check** - Validates project setup and dependencies
+2. **Redis Startup** - Ensures Redis is running and accessible
+3. **Connection Test** - Verifies Python can connect to Redis
+4. **User Choice** - Presents menu for different demo modes
+5. **Demo Execution** - Runs selected demonstration
+6. **Help Display** - Shows available commands for further exploration
+
+### Example Output
+
 ```bash
-bash setup-env.sh          # Complete environment setup
-source activate-env.sh      # Activate virtual environment  
-bash cleanup.sh             # Clean up everything
-```
+>>> Activating virtual environment...
+Python 3.12.10
+E:\_SoftEng\_BeCode\caching-csv-data-processing-redis\.venv\Scripts\python.exe
 
-### Make Commands
+>>> Checking Redis connection...
+>>> Redis is already running!
+
+>>> Testing Redis connection from Python...
+>>> Redis connection test passed!
+
+What would you like to run?
+1. Quick demo (automated cache performance)
+2. Interactive analysis (manual menu)  
+3. Both (demo first, then interactive)
+4. Exit
+
+Enter your choice (1-4): 1
+
+>>> Running automated demo...
+[Performance demonstration with 250x+ speedup results]
+```
+![picture 0](images/789e9ac18286f88de7702f53e2b8a16c31197e82c6174b62061a8800d6e9e8da.png)  
+
+![picture 1](images/1086ebb290aaa91771f69c95779639dcab19d8ce90d4139b7827836fd003976e.png)  
+
+
+### Error Handling
+
+The script includes comprehensive error checking:
+- **Directory validation** - Ensures you're in the project root
+- **Environment verification** - Checks for virtual environment
+- **Redis connectivity** - Validates Docker and Redis status
+- **Graceful failures** - Clear error messages with colored output
+
+This script is perfect for:
+- **First-time setup** - Complete project initialization
+- **Demonstrations** - Showing Redis caching benefits
+- **Development** - Quick testing during development
+- **Troubleshooting** - Environment and connection validation
+
+## Interactive Analysis Options
+
+When you run `./test-demo.sh` and select option 2 (Interactive Analysis), you get access to 9 different analytical queries:
+
+### Available Analysis Options
+
+| Option | Analysis Type | What It Does | Typical Time |
+|--------|---------------|--------------|--------------|
+| 1 | **Average Arrival Delay per Airline** | Calculates mean arrival delays for each carrier | 2-5 seconds (CSV) / 0.002s (cache) |
+| 2 | **Average Departure Delay per Airline** | Calculates mean departure delays for each carrier | 2-5 seconds (CSV) / 0.002s (cache) |
+| 3 | **Total Flights per Origin Airport** | Counts flights departing from each airport | 1-3 seconds (CSV) / 0.001s (cache) |
+| 4 | **Total Flights per Destination Airport** | Counts flights arriving at each airport | 1-3 seconds (CSV) / 0.001s (cache) |
+| 5 | **Monthly Delay Statistics** | Aggregates delay data by month | 3-6 seconds (CSV) / 0.002s (cache) |
+| 6 | **Comprehensive Airline Performance** | Complete airline analysis with multiple metrics | 5-10 seconds (CSV) / 0.003s (cache) |
+| 7 | **Show Performance Summary** | Displays cache hit/miss statistics | Instant |
+| 8 | **Clear Cache** | Removes all cached results | Instant |
+| 9 | **Exit** | Returns to main menu | Instant |
+
+### What Happens When You Select an Option
+
+**First Time (Cache Miss):**
+1. System displays: `Computing [Analysis Type]...`
+2. Shows: `INFO:cache:Cache MISS for key: [specific_cache_key]`
+3. Processes CSV data (2-10 seconds depending on complexity)
+4. Shows: `Computing from CSV data...`
+5. Caches result: `INFO:cache:Cached key: [key_name] (TTL: 60s)`
+6. Displays: `Result cached in Redis`
+7. Shows formatted results table
+
+**Second Time (Cache Hit):**
+1. System displays: `Computing [Analysis Type]...`
+2. Shows: `INFO:cache:Cache HIT for key: [specific_cache_key]`
+3. Retrieves from Redis (0.001-0.003 seconds)
+4. Shows formatted results table immediately
+
+### Example: Average Departure Delay Analysis
+
 ```bash
-make setup                  # Setup complete environment
-make docker-up              # Start Redis
-make demo                   # Run automated demo
-make analyze                # Interactive analysis
-make test                   # Test Redis connection
-make clean                  # Clean up everything
+Enter your choice: 2
+
+Computing Average Departure Delay per Airline...
+INFO:cache:Cache MISS for key: airline_data:avg_delay_airline:delay_type:DEP_DELAY
+Computing from CSV data...
+INFO:cache:Cached key: airline_data:avg_delay_airline:delay_type:DEP_DELAY (TTL: 60s)
+Result cached in Redis
+
+Average Departure Delay per Airline (minutes)
+┌────────┬────────┐
+│ Item   │ Value  │
+├────────┼────────┤
+│ NK     │ 15.94  │
+│ UA     │ 14.44  │
+│ F9     │ 13.35  │
+│ B6     │ 11.51  │
+│ WN     │ 10.58  │
+│ MQ     │ 10.13  │
+│ VX     │  9.02  │
+│ AA     │  8.90  │
+│ EV     │  8.72  │
+│ OO     │  7.80  │
+└────────┴────────┘
 ```
 
-### Docker Management
+### Performance Impact
+
+- **Dataset Size**: 100,000+ flight records (or 5.8M if using real data)
+- **Processing Time**: 2-10 seconds for complex aggregations
+- **Cache Speedup**: 250-500x faster on subsequent queries
+- **Memory Usage**: Results cached in Redis for 60 seconds
+- **Cache Keys**: Unique per analysis type and parameters
+
+## Commands
+
 ```bash
-docker-compose up -d redis              # Start Redis
-docker-compose --profile gui up -d      # Start with Web UI
-docker-compose down                      # Stop everything
-docker-compose logs redis               # View Redis logs
+# Application
+python app/main.py test      # Test Redis connection
+python app/main.py demo      # Performance demo
+python app/main.py analyze   # Interactive analysis
+
+# Automated Demo
+./test-demo.sh               # Complete test & demo suite
+
+# Docker & Redis
+./start-redis.sh             # Start Redis (with checks)
+docker-compose up -d redis   # Start Redis (manual)
+docker-compose down          # Stop Redis
+docker-compose logs redis    # View logs
+
+# Environment
+./setup-env.sh              # Setup (includes activation)
+./cleanup.sh                # Complete cleanup (see below)
 ```
 
-## �📊 Features
+## Cleanup Script
 
-### Core Analytics
-- **Average delay per airline** (arrival/departure)
-- **Total flights per airport** (origin/destination)
-- **Monthly delay statistics**
-- **Comprehensive airline performance metrics**
+The `cleanup.sh` script completely resets your development environment:
 
-### Caching Features
-- ✅ **Redis caching** with configurable TTL
-- ✅ **Cache hit/miss tracking**
-- ✅ **Performance comparison**
-- ✅ **Cache invalidation**
-- ✅ **Structured data storage** (JSON serialization)
+**What it removes:**
+- Redis Docker containers and images
+- Python virtual environment (`.venv`)
+- Cache files (`__pycache__`, `.pytest_cache`)
+- VS Code settings (`.vscode`)
+- Jupyter kernel registration
+- Log files
 
-### Nice-to-Have Features
-- ✅ **Multiple query types**
-- ✅ **Redis health monitoring**
-- ✅ **Cache statistics dashboard**
-- ✅ **Docker support**
-- ✅ **Beautiful CLI interface**
-- ✅ **Comprehensive logging**
-
-## 🏗️ Architecture
-
-```
-┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│   CSV Dataset   │    │   Redis Cache   │    │  CLI Interface  │
-│                 │    │                 │    │                 │
-│ • Flight data   │◄──►│ • Cached results│◄──►│ • Interactive   │
-│ • 100k+ rows    │    │ • TTL: 60s      │    │ • Performance   │
-│ • Multiple cols │    │ • JSON format   │    │ • Statistics    │
-└─────────────────┘    └─────────────────┘    └─────────────────┘
-```
-
-## 📁 Project Structure
-
-```
-caching-csv-data-processing-redis/
-├── app/
-│   ├── main.py              # Main application with CLI
-│   └── cache.py             # Redis connection helper
-├── data/
-│   └── flights.csv          # Dataset (auto-generated if missing)
-├── Statement/
-│   └── 03-large-csv-caching-exercice.md
-├── docker-compose.yml       # Redis setup
-├── requirements.txt         # Python dependencies
-├── .env                     # Configuration
-├── REDIS_SETUP.md          # Redis installation guide
-└── README.md               # This file
-```
-
-## 🔧 Configuration
-
-Edit `.env` file to customize settings:
-
-```env
-# Redis Configuration
-REDIS_HOST=localhost
-REDIS_PORT=6379
-REDIS_DB=0
-REDIS_PASSWORD=
-
-# Cache Configuration
-CACHE_TTL=60                 # Time-to-live in seconds
-
-# Dataset Configuration
-CSV_FILE_PATH=data/flights.csv
-```
-
-## 🎮 Usage Examples
-
-### Interactive Analysis
+**Usage:**
 ```bash
-cd app
-python main.py analyze
+./cleanup.sh               # Interactive cleanup with confirmation
 ```
 
-### Automated Demo
-```bash
-cd app
-python main.py demo
-```
+**When to use:**
+- Project reset/fresh start
+- Troubleshooting environment issues
+- Before sharing/committing project
+- Storage cleanup
 
-### Test Redis Connection
-```bash
-cd app
-python main.py test
-```
+## Performance Results
 
-## 📈 Performance Results
+Cache provides **250x+ speedup** for repeated queries:
 
-Here's what you can expect to see:
-
-### First Run (Computing from CSV)
 ```
-📊 Computing from CSV data...
-💾 Result cached in Redis
-⏱️  Execution time: 1.234 seconds
+First Run (CSV): 0.504 seconds
+Second Run (Cache): 0.002 seconds  
+Speedup: 252.0x faster with cache!
 ```
-
-### Second Run (Retrieved from Cache)
-```
-🎯 Retrieved from Redis cache
-⏱️  Execution time: 0.003 seconds
-🚀 Speedup: 411x faster!
-```
-
-### Performance Comparison Table
-```
-┏━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━┳━━━━━━━━━━━━━┓
-┃ Query Type          ┃ CSV Time (avg)  ┃ Cache Time (avg) ┃ Speedup   ┃ Cache Hits  ┃
-┡━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━╇━━━━━━━━━━━━━┩
-│ avg_delay_airline   │ 1.234s          │ 0.003s           │ 411.3x    │ 5           │
-│ flights_airport     │ 0.567s          │ 0.002s           │ 283.5x    │ 3           │
-│ airline_performance │ 2.345s          │ 0.004s           │ 586.3x    │ 2           │
-└─────────────────────┴─────────────────┴──────────────────┴───────────┴─────────────┘
-```
-
-### Redis Statistics
-```
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-┃                              Redis Statistics                               ┃
-┡━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│ Total Keys: 12                                                              │
-│ Cache Hits: 23,456                                                          │
-│ Cache Misses: 1,234                                                         │
-│ Hit Rate: 95.0%                                                             │
-│ Memory Usage: 2.1MB                                                         │
-└─────────────────────────────────────────────────────────────────────────────┘
-```
-
-## 🗂️ Dataset
+## Dataset
 
 The application uses airline delay data with the following structure:
 
@@ -231,165 +344,52 @@ The application uses airline delay data with the following structure:
 | DEST        | Destination airport            | ORD, DFW    |
 | DEP_DELAY   | Departure delay (minutes)      | 15.5        |
 | ARR_DELAY   | Arrival delay (minutes)        | 12.3        |
-| DISTANCE    | Flight distance (miles)        | 1247        |
-| AIR_TIME    | Flight duration (minutes)      | 145         |
 
 **Note:** If no dataset is provided, the application automatically generates 100,000 sample flights for demonstration.
 
-## 🐳 Docker Setup
+## Configuration
 
-### Start Redis Only
-```bash
-docker-compose up -d redis
-```
-
-### Start with Redis Web UI
-```bash
-docker-compose --profile gui up -d
-```
-- Redis: `localhost:6379`
-- Redis Commander (Web UI): `http://localhost:8081`
-
-### Stop Services
-```bash
-docker-compose down
-```
-
-## 🔍 Sample Output
-
-### Average Delay Analysis
-```
-┏━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-┃ Airline  ┃                      Average Arrival Delay (minutes)                ┃
-┡━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│ AA       │ 12.45                                                                │
-│ DL       │ 8.92                                                                 │
-│ UA       │ 15.67                                                                │
-│ WN       │ 11.23                                                                │
-│ AS       │ 9.78                                                                 │
-└──────────┴──────────────────────────────────────────────────────────────────────┘
-```
-
-### Airport Traffic Analysis
-```
-┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-┃ Airport      ┃                    Total Flights per Origin Airport              ┃
-┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│ ATL          │ 8,234                                                            │
-│ LAX          │ 7,456                                                            │
-│ ORD          │ 6,789                                                            │
-│ DFW          │ 6,123                                                            │
-│ DEN          │ 5,567                                                            │
-└──────────────┴──────────────────────────────────────────────────────────────────┘
-```
-
-## 🧪 Testing
-
-### Test Redis Connection
-```bash
-cd app
-python cache.py
-```
-
-### Run Analysis Demo
-```bash
-cd app
-python main.py demo
-```
-
-### Manual Testing
-```bash
-cd app
-python main.py analyze
-# Select option 1, then run it again to see caching in action
-```
-
-## 🚨 Troubleshooting
-
-### Redis Connection Issues
-```bash
-# Check if Redis is running
-docker-compose ps
-
-# View Redis logs
-docker-compose logs redis
-
-# Test connection manually
-redis-cli ping
-```
-
-### Data Loading Issues
-- The app automatically generates sample data if CSV is missing
-- Check file permissions in the `data/` directory
-- Verify CSV format matches expected columns
-
-### Performance Issues
-- Increase cache TTL in `.env` for longer cache retention
-- Monitor Redis memory usage with `docker stats`
-- Use smaller dataset for testing
-
-## 🔧 Advanced Configuration
-
-### Custom Dataset
-Place your airline dataset in `data/flights.csv` with required columns:
-- `OP_CARRIER`, `ORIGIN`, `DEST`, `ARR_DELAY`, `DEP_DELAY`
-
-### Redis Optimization
 ```env
-# Increase TTL for longer cache retention
-CACHE_TTL=300
+# Redis Configuration
+REDIS_HOST=localhost
+REDIS_PORT=6379
+REDIS_DB=0
 
-# Use different Redis database
-REDIS_DB=1
+# Cache Configuration  
+CACHE_TTL=60                 # Time-to-live in seconds
+
+# Dataset Configuration
+CSV_FILE_PATH=data/flights.csv
 ```
 
-### Production Setup
-- Use Redis Cluster for high availability
-- Implement connection pooling
-- Add Redis authentication
-- Monitor cache hit rates
+## Project Structure
 
-## 📊 Cache Strategy
-
-### Key Generation
-```python
-cache_key = f"airline_data:{query_type}:{param1}:{param2}"
-# Example: "airline_data:avg_delay_airline:ARR_DELAY"
+```
+caching-csv-data-processing-redis/
+├── app/
+│   ├── main.py              # Main application with CLI
+│   └── cache.py             # Redis connection helper
+├── data/
+│   └── flights.csv          # Dataset (auto-generated if missing)
+├── docker-compose.yml       # Redis setup
+├── requirements.txt         # Python dependencies
+└── README.md               # This file
 ```
 
-### TTL Policy
-- Default: 60 seconds
-- Configurable via environment variables
-- Automatic expiration and refresh
+## Troubleshooting
 
-### Data Serialization
-- JSON format for cross-platform compatibility
-- Handles datetime objects automatically
-- Preserves data types
+**Docker not running:** Start Docker Desktop and run `docker --version`
 
-## 🎯 Learning Outcomes
+**Redis connection failed:** Check `docker-compose ps` and restart with `docker-compose restart redis`
 
-After completing this project, you'll understand:
+**Module not found:** Reinstall with `pip install -r requirements.txt`
 
-- ✅ **Redis caching patterns** and best practices
-- ✅ **Performance optimization** with caching layers
-- ✅ **TTL strategies** for data freshness
-- ✅ **Cache invalidation** techniques
-- ✅ **Monitoring and metrics** for cache performance
-- ✅ **Real-world data processing** with pandas
+**Column errors:** App handles different column names automatically
 
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-## 📄 License
+## License
 
 This project is part of the BeCode Data Engineering curriculum.
 
 ---
 
-**Happy Caching! 🚀**
+**Happy Caching!**

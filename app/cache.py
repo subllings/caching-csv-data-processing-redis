@@ -13,6 +13,10 @@ class RedisCache:
     
     def __init__(self):
         """Initialize Redis connection with configuration from environment variables"""
+        # Set up logging first
+        logging.basicConfig(level=logging.INFO)
+        self.logger = logging.getLogger(__name__)
+        
         self.host = os.getenv('REDIS_HOST', 'localhost')
         self.port = int(os.getenv('REDIS_PORT', 6379))
         self.db = int(os.getenv('REDIS_DB', 0))
@@ -22,10 +26,6 @@ class RedisCache:
         # Initialize Redis client
         self.redis_client = None
         self.connect()
-        
-        # Set up logging
-        logging.basicConfig(level=logging.INFO)
-        self.logger = logging.getLogger(__name__)
     
     def connect(self) -> bool:
         """Establish connection to Redis server"""
@@ -42,15 +42,15 @@ class RedisCache:
             
             # Test the connection
             self.redis_client.ping()
-            self.logger.info(f"✅ Connected to Redis at {self.host}:{self.port}")
+            self.logger.info(f"Connected to Redis at {self.host}:{self.port}")
             return True
             
         except redis.ConnectionError as e:
-            self.logger.error(f"❌ Failed to connect to Redis: {e}")
+            self.logger.error(f"Failed to connect to Redis: {e}")
             self.redis_client = None
             return False
         except Exception as e:
-            self.logger.error(f"❌ Unexpected error connecting to Redis: {e}")
+            self.logger.error(f"Unexpected error connecting to Redis: {e}")
             self.redis_client = None
             return False
     
@@ -73,10 +73,10 @@ class RedisCache:
         try:
             value = self.redis_client.get(key)
             if value:
-                self.logger.info(f"🎯 Cache HIT for key: {key}")
+                self.logger.info(f"Cache HIT for key: {key}")
                 return json.loads(value)
             else:
-                self.logger.info(f"❌ Cache MISS for key: {key}")
+                self.logger.info(f"Cache MISS for key: {key}")
                 return None
         except Exception as e:
             self.logger.error(f"Error getting key {key}: {e}")
@@ -92,7 +92,7 @@ class RedisCache:
             ttl = ttl or self.ttl
             serialized_value = json.dumps(value, default=str)  # default=str handles datetime objects
             result = self.redis_client.setex(key, ttl, serialized_value)
-            self.logger.info(f"💾 Cached key: {key} (TTL: {ttl}s)")
+            self.logger.info(f"Cached key: {key} (TTL: {ttl}s)")
             return result
         except Exception as e:
             self.logger.error(f"Error setting key {key}: {e}")
@@ -105,7 +105,7 @@ class RedisCache:
         
         try:
             result = self.redis_client.delete(key)
-            self.logger.info(f"🗑️ Deleted key: {key}")
+            self.logger.info(f"Deleted key: {key}")
             return result > 0
         except Exception as e:
             self.logger.error(f"Error deleting key {key}: {e}")
@@ -118,7 +118,7 @@ class RedisCache:
         
         try:
             self.redis_client.flushdb()
-            self.logger.info("🧹 Cleared all cache keys")
+            self.logger.info("Cleared all cache keys")
             return True
         except Exception as e:
             self.logger.error(f"Error clearing cache: {e}")
@@ -186,14 +186,14 @@ cache = RedisCache()
 
 def test_redis_connection():
     """Test function to verify Redis connection works"""
-    print("🔧 Testing Redis connection...")
+    print("Testing Redis connection...")
     
     # Health check
     health = cache.health_check()
     print(f"Health check: {health}")
     
     if not health['connected']:
-        print("❌ Redis connection failed!")
+        print("Redis connection failed!")
         return False
     
     # Test basic operations
@@ -210,7 +210,7 @@ def test_redis_connection():
     # Clean up
     cache.delete(test_key)
     
-    print("✅ Redis connection test completed successfully!")
+    print("Redis connection test completed successfully!")
     return True
 
 

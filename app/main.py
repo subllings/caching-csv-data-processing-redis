@@ -43,32 +43,35 @@ class AirlineDataAnalyzer:
     def load_data(self) -> bool:
         """Load CSV data into memory"""
         try:
-            console.print("📊 Loading airline data...", style="blue")
+            console.print("Loading airline data...", style="blue")
             
             with Progress(
                 SpinnerColumn(),
                 TextColumn("[progress.description]{task.description}"),
-                console=console,
+                console=console
             ) as progress:
-                task = progress.add_task("Loading CSV data...", total=None)
+                task = progress.add_task("Loading data...", total=None)
                 
                 start_time = time.time()
                 
-                # Check if file exists
+                # Check if CSV exists
                 if not os.path.exists(self.csv_file_path):
-                    # Create sample data if file doesn't exist
-                    console.print("⚠️ CSV file not found. Creating sample data...", style="yellow")
+                    console.print("CSV file not found. Creating sample data...", style="yellow")
                     self._create_sample_data()
                 
                 # Load the data
                 self.data = pd.read_csv(self.csv_file_path)
+                
+                # Auto-map column names to expected format
+                self._map_column_names()
+                
                 load_time = time.time() - start_time
                 
                 progress.update(task, completed=True)
             
             # Display data info
-            console.print(f"✅ Data loaded successfully in {load_time:.2f}s", style="green")
-            console.print(f"📈 Dataset shape: {self.data.shape[0]:,} rows × {self.data.shape[1]} columns")
+            console.print(f"Data loaded successfully in {load_time:.2f}s", style="green")
+            console.print(f"Dataset shape: {self.data.shape[0]:,} rows × {self.data.shape[1]} columns")
             
             # Show sample of the data
             self._display_data_sample()
@@ -76,13 +79,43 @@ class AirlineDataAnalyzer:
             return True
             
         except Exception as e:
-            console.print(f"❌ Error loading data: {e}", style="red")
+            console.print(f"Error loading data: {e}", style="red")
             logger.error(f"Failed to load data: {e}")
             return False
     
+    def _map_column_names(self):
+        """Map real CSV column names to expected names"""
+        if self.data is None:
+            return
+            
+        column_mapping = {
+            'AIRLINE': 'OP_CARRIER',
+            'ARRIVAL_DELAY': 'ARR_DELAY', 
+            'DEPARTURE_DELAY': 'DEP_DELAY',
+            'ORIGIN_AIRPORT': 'ORIGIN',
+            'DESTINATION_AIRPORT': 'DEST'
+        }
+        
+        # Check current columns
+        current_cols = list(self.data.columns)
+        console.print(f"Original columns found: {len(current_cols)} columns", style="cyan")
+        
+        # Apply mapping if needed
+        renamed_count = 0
+        for old_name, new_name in column_mapping.items():
+            if old_name in current_cols and new_name not in current_cols:
+                self.data = self.data.rename(columns={old_name: new_name})
+                renamed_count += 1
+                console.print(f"Mapped '{old_name}' → '{new_name}'", style="yellow")
+        
+        if renamed_count > 0:
+            console.print(f"Mapped {renamed_count} columns to expected format", style="green")
+        else:
+            console.print("No column mapping needed", style="green")
+    
     def _create_sample_data(self):
         """Create sample airline data for demonstration"""
-        console.print("🔧 Generating sample airline data...", style="cyan")
+        console.print("Generating sample airline data...", style="cyan")
         
         # Sample data generation
         np.random.seed(42)
@@ -113,7 +146,7 @@ class AirlineDataAnalyzer:
         os.makedirs(os.path.dirname(self.csv_file_path), exist_ok=True)
         sample_df.to_csv(self.csv_file_path, index=False)
         
-        console.print(f"✅ Sample data created: {n_flights:,} flights saved to {self.csv_file_path}", style="green")
+        console.print(f"Sample data created: {n_flights:,} flights saved to {self.csv_file_path}", style="green")
     
     def _display_data_sample(self):
         """Display a sample of the loaded data"""
@@ -164,11 +197,12 @@ class AirlineDataAnalyzer:
         if cached_result is not None:
             execution_time = time.time() - start_time
             self._track_query_time('avg_delay_airline', execution_time, from_cache=True)
-            console.print("🎯 Retrieved from Redis cache", style="green")
+            console.print("Retrieved from Redis cache", style="green")
+            console.print(f"⚡ CACHE HIT: {execution_time:.3f} seconds", style="bold green")
             return cached_result
         
         # Calculate from CSV
-        console.print("📊 Computing from CSV data...", style="yellow")
+        console.print("Computing from CSV data...", style="yellow")
         
         try:
             # Simulate expensive computation with some processing time
@@ -181,7 +215,8 @@ class AirlineDataAnalyzer:
             
             # Cache the result
             self.cache.set(cache_key, result)
-            console.print("💾 Result cached in Redis", style="blue")
+            console.print("Result cached in Redis", style="blue")
+            console.print(f"📊 CSV CALCULATION: {execution_time:.3f} seconds", style="bold yellow")
             
             return result
             
@@ -205,11 +240,12 @@ class AirlineDataAnalyzer:
         if cached_result is not None:
             execution_time = time.time() - start_time
             self._track_query_time('flights_airport', execution_time, from_cache=True)
-            console.print("🎯 Retrieved from Redis cache", style="green")
+            console.print("Retrieved from Redis cache", style="green")
+            console.print(f"⚡ CACHE HIT: {execution_time:.3f} seconds", style="bold green")
             return cached_result
         
         # Calculate from CSV
-        console.print("📊 Computing from CSV data...", style="yellow")
+        console.print("Computing from CSV data...", style="yellow")
         
         try:
             time.sleep(0.3)  # Simulate processing delay
@@ -221,7 +257,8 @@ class AirlineDataAnalyzer:
             
             # Cache the result
             self.cache.set(cache_key, result)
-            console.print("💾 Result cached in Redis", style="blue")
+            console.print("Result cached in Redis", style="blue")
+            console.print(f"📊 CSV CALCULATION: {execution_time:.3f} seconds", style="bold yellow")
             
             return result
             
@@ -240,11 +277,12 @@ class AirlineDataAnalyzer:
         if cached_result is not None:
             execution_time = time.time() - start_time
             self._track_query_time('delay_stats_month', execution_time, from_cache=True)
-            console.print("🎯 Retrieved from Redis cache", style="green")
+            console.print("Retrieved from Redis cache", style="green")
+            console.print(f"⚡ CACHE HIT: {execution_time:.3f} seconds", style="bold green")
             return cached_result
         
         # Calculate from CSV
-        console.print("📊 Computing from CSV data...", style="yellow")
+        console.print("Computing from CSV data...", style="yellow")
         
         try:
             time.sleep(0.7)  # Simulate processing delay
@@ -264,7 +302,8 @@ class AirlineDataAnalyzer:
             
             # Cache the result
             self.cache.set(cache_key, result)
-            console.print("💾 Result cached in Redis", style="blue")
+            console.print("Result cached in Redis", style="blue")
+            console.print(f"📊 CSV CALCULATION: {execution_time:.3f} seconds", style="bold yellow")
             
             return result
             
@@ -283,11 +322,12 @@ class AirlineDataAnalyzer:
         if cached_result is not None:
             execution_time = time.time() - start_time
             self._track_query_time('airline_performance', execution_time, from_cache=True)
-            console.print("🎯 Retrieved from Redis cache", style="green")
+            console.print("Retrieved from Redis cache", style="green")
+            console.print(f"⚡ CACHE HIT: {execution_time:.3f} seconds", style="bold green")
             return cached_result
         
         # Calculate from CSV
-        console.print("📊 Computing comprehensive airline performance...", style="yellow")
+        console.print("Computing comprehensive airline performance...", style="yellow")
         
         try:
             time.sleep(1.0)  # Simulate expensive computation
@@ -320,7 +360,8 @@ class AirlineDataAnalyzer:
             
             # Cache the result
             self.cache.set(cache_key, result)
-            console.print("💾 Result cached in Redis", style="blue")
+            console.print("Result cached in Redis", style="blue")
+            console.print(f"📊 CSV CALCULATION: {execution_time:.3f} seconds", style="bold yellow")
             
             return result
             
@@ -429,9 +470,9 @@ class AirlineDataAnalyzer:
         """Clear all cached data"""
         success = self.cache.clear_all()
         if success:
-            console.print("🧹 Cache cleared successfully", style="green")
+            console.print("Cache cleared successfully", style="green")
         else:
-            console.print("❌ Failed to clear cache", style="red")
+            console.print("Failed to clear cache", style="red")
 
 
 # CLI Interface
@@ -457,12 +498,19 @@ def analyze(csv_file):
     # Check Redis connection
     health = analyzer.cache.health_check()
     if health['connected']:
-        console.print(f"✅ Redis connected (latency: {health['latency_ms']}ms)", style="green")
+        console.print(f"Redis connected (latency: {health['latency_ms']}ms)", style="green")
     else:
-        console.print(f"❌ Redis connection failed: {health['error']}", style="red")
+        console.print(f"Redis connection failed: {health['error']}", style="red")
         return
     
-    # Interactive menu
+    # Interactive menu with cache explanation
+    console.print("\n" + "=" * 50, style="bold green")
+    console.print("CACHE DEMO TIP:", style="bold yellow")
+    console.print("   • First time you select an option = SLOW (Cache MISS)")
+    console.print("   • Second time SAME option = FAST (Cache HIT)")
+    console.print("   • Try option 1 twice to see 250x+ speedup!")
+    console.print("=" * 50, style="bold green")
+    
     while True:
         console.print("\n" + "="*50)
         console.print("Select an analysis option:", style="bold")
@@ -479,32 +527,32 @@ def analyze(csv_file):
         choice = click.prompt("Enter your choice", type=int)
         
         if choice == 1:
-            console.print("\n📊 Computing Average Arrival Delay per Airline...")
+            console.print("\nComputing Average Arrival Delay per Airline...")
             result = analyzer.get_average_delay_per_airline('ARR_DELAY')
             analyzer.display_results(result, "Average Arrival Delay per Airline (minutes)")
             
         elif choice == 2:
-            console.print("\n📊 Computing Average Departure Delay per Airline...")
+            console.print("\nComputing Average Departure Delay per Airline...")
             result = analyzer.get_average_delay_per_airline('DEP_DELAY')
             analyzer.display_results(result, "Average Departure Delay per Airline (minutes)")
             
         elif choice == 3:
-            console.print("\n📊 Computing Total Flights per Origin Airport...")
+            console.print("\nComputing Total Flights per Origin Airport...")
             result = analyzer.get_flights_per_airport('ORIGIN')
             analyzer.display_results(result, "Total Flights per Origin Airport")
             
         elif choice == 4:
-            console.print("\n📊 Computing Total Flights per Destination Airport...")
+            console.print("\nComputing Total Flights per Destination Airport...")
             result = analyzer.get_flights_per_airport('DEST')
             analyzer.display_results(result, "Total Flights per Destination Airport")
             
         elif choice == 5:
-            console.print("\n📊 Computing Monthly Delay Statistics...")
+            console.print("\nComputing Monthly Delay Statistics...")
             result = analyzer.get_delay_stats_by_month()
             analyzer.display_results(result, "Monthly Delay Statistics", limit=12)
             
         elif choice == 6:
-            console.print("\n📊 Computing Comprehensive Airline Performance...")
+            console.print("\nComputing Comprehensive Airline Performance...")
             result = analyzer.get_airline_performance_summary()
             analyzer.display_results(result, "Comprehensive Airline Performance Summary")
             
@@ -515,7 +563,7 @@ def analyze(csv_file):
             analyzer.clear_cache()
             
         elif choice == 9:
-            console.print("👋 Goodbye!", style="blue")
+            console.print("Goodbye!", style="blue")
             break
             
         else:
@@ -526,7 +574,7 @@ def analyze(csv_file):
 @click.option('--csv-file', default='data/flights.csv', help='Path to CSV file')
 def demo(csv_file):
     """Run automated demo showing cache performance"""
-    console.print(Panel("🚀 Automated Demo: Cache Performance", style="bold green"))
+    console.print(Panel("Automated Demo: Cache Performance", style="bold green"))
     
     analyzer = AirlineDataAnalyzer(csv_file)
     
@@ -536,16 +584,16 @@ def demo(csv_file):
     # Clear cache to start fresh
     analyzer.clear_cache()
     
-    console.print("\n🎯 Demo: Running same query twice to show cache performance\n")
+    console.print("\nDemo: Running same query twice to show cache performance\n")
     
     # First run (from CSV)
-    console.print("📊 First run (computing from CSV):", style="bold yellow")
+    console.print("First run (computing from CSV):", style="bold yellow")
     start_time = time.time()
     result1 = analyzer.get_average_delay_per_airline('ARR_DELAY')
     first_run_time = time.time() - start_time
     
     # Second run (from cache)
-    console.print("\n📊 Second run (retrieving from cache):", style="bold green")
+    console.print("\nSecond run (retrieving from cache):", style="bold green")
     start_time = time.time()
     result2 = analyzer.get_average_delay_per_airline('ARR_DELAY')
     second_run_time = time.time() - start_time
@@ -559,7 +607,7 @@ def demo(csv_file):
     perf_panel = Panel(
         f"First Run (CSV): {first_run_time:.3f} seconds\n"
         f"Second Run (Cache): {second_run_time:.3f} seconds\n"
-        f"Speedup: {speedup:.1f}x faster with cache! 🚀",
+        f"Speedup: {speedup:.1f}x faster with cache!",
         title="Performance Comparison",
         style="bold magenta"
     )
@@ -569,19 +617,19 @@ def demo(csv_file):
 @cli.command()
 def test():
     """Test Redis connection"""
-    console.print("🔧 Testing Redis connection...")
+    console.print("Testing Redis connection...")
     
     health = cache.health_check()
     console.print(f"Connection status: {health}")
     
     if health['connected']:
-        console.print("✅ Redis is working perfectly!", style="green")
+        console.print("Redis is working perfectly!", style="green")
         
         # Show some stats
         stats = cache.get_stats()
-        console.print(f"📊 Redis Stats: {stats}")
+        console.print(f"Redis Stats: {stats}")
     else:
-        console.print("❌ Redis connection failed!", style="red")
+        console.print("Redis connection failed!", style="red")
 
 
 if __name__ == "__main__":
