@@ -214,5 +214,61 @@ def test_redis_connection():
     return True
 
 
+# Simple caching decorator for the project
+def cached(key_template: str, ttl: Optional[int] = None):
+    """
+    Simple caching decorator for this project
+    
+    Usage:
+        @cached("airline_data:avg_delay:{delay_type}")
+        def get_delays(delay_type):
+            return expensive_calculation()
+    """
+    import functools
+    import inspect
+    import time
+    from rich.console import Console
+    
+    console = Console()
+    
+    def decorator(func):
+        @functools.wraps(func)
+        def wrapper(*args, **kwargs):
+            # Generate cache key from template and arguments
+            try:
+                sig = inspect.signature(func)
+                bound_args = sig.bind(*args, **kwargs)
+                bound_args.apply_defaults()
+                cache_key = key_template.format(**bound_args.arguments)
+            except:
+                cache_key = f"{func.__name__}:{hash(str(args) + str(kwargs))}"
+            
+            # Try cache first
+            start_time = time.time()
+            cached_result = cache.get(cache_key)
+            
+            if cached_result is not None:
+                execution_time = time.time() - start_time
+                console.print("Retrieved from Redis cache", style="green")
+                console.print(f"⚡ CACHE HIT: {execution_time:.3f} seconds", style="bold green")
+                return cached_result
+            
+            # Cache miss - execute function
+            console.print("Computing from CSV data...", style="yellow")
+            result = func(*args, **kwargs)
+            
+            execution_time = time.time() - start_time
+            
+            # Cache the result
+            cache.set(cache_key, result, ttl)
+            console.print("Result cached in Redis", style="blue")
+            console.print(f"📊 CSV CALCULATION: {execution_time:.3f} seconds", style="bold yellow")
+            
+            return result
+        
+        return wrapper
+    return decorator
+
+
 if __name__ == "__main__":
     test_redis_connection()
